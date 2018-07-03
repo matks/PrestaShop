@@ -1,7 +1,7 @@
 const {AccessPageBO} = require('../../../selectors/BO/access_page');
 const {ModulePage} = require('../../../selectors/BO/module_page');
 const {AddProductPage} = require('../../../selectors/BO/add_product_page');
-const module_common_scenarios = require('./module');
+const module_common_scenarios = require('../../common_scenarios/module');
 const {Menu} = require('../../../selectors/BO/menu.js');
 let promise = Promise.resolve();
 
@@ -23,7 +23,7 @@ scenario('Install "PrestaShop Security" module', () => {
     test('should click on "Installed Modules"', () => client.waitForExistAndClick(ModulePage.installed_modules_tabs, 1000));
     test('should search for "PrestaShop Security" module in the installed module tab', () => client.waitAndSetValue(ModulePage.modules_search_input, "prestafraud"));
     test('should click on "Search" button', () => client.waitForExistAndClick(ModulePage.modules_search_button));
-    test('should check if the module "prestafraud" was installed', () => client.checkTextValue(ModulePage.built_in_module, "1", "contain"));
+    test('should check if the module "prestafraud" was installed', () => client.checkTextValue(ModulePage.built_in_module_span, "1", "contain"));
   }, 'common_client');
   scenario('Check Configuration page of "PrestaShop Security" module', client => {
     module_common_scenarios.checkConfigPage(client, ModulePage, "prestafraud");

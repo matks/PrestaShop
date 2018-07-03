@@ -1,4 +1,4 @@
-const common_scenarios = require('../high/02_product/product');
+const common_scenarios = require('../common_scenarios/product');
 const {AccessPageBO} = require('../../selectors/BO/access_page');
 const {AddProductPage} = require('../../selectors/BO/add_product_page');
 const {productPage} = require('../../selectors/FO/product_page');
@@ -6,7 +6,7 @@ const {AccessPageFO} = require('../../selectors/FO/access_page');
 const {SearchProductPage} = require('../../selectors/FO/search_product_page');
 let promise = Promise.resolve();
 
-var productData = {
+let productData = {
   name: 'Dress',
   quantity: "10",
   price: '5',

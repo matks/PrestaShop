@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2017 PrestaShop
+ * 2007-2018 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2017 PrestaShop SA
+ * @copyright 2007-2018 PrestaShop SA
  * @license   https://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  * International Registered Trademark & Property of PrestaShop SA
  */
@@ -29,15 +29,20 @@ $template = file_get_contents(__DIR__.'/index_template.php');
 if ($handle = opendir(__DIR__.'/content')) {
   while (false !== ($entry = readdir($handle))) {
     $filePath = __DIR__.'/content/'.$entry;
+
     if (is_file($filePath)) {
       echo "File found: $entry\n";
+
       if (strpos($template, $entry)) {
         echo "\033[0;32mReplace entry: $entry\033[0m\n";
+
+        $content = base64_encode(file_get_contents($filePath));
         $template = str_replace(
-          "'$entry'",
-          '<<<EOF'.PHP_EOL.base64_encode(file_get_contents($filePath)).PHP_EOL.'EOF'.PHP_EOL,
+          "getFileContent('$entry', true)",
+          "getFileContent('$content', false)",
           $template
         );
+
       } else {
         echo "\033[0;31mFile not present on the template\033[0m\n";
       }

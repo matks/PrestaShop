@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2017 PrestaShop
+ * 2007-2018 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -19,12 +19,14 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2017 PrestaShop SA
+ * @copyright 2007-2018 PrestaShop SA
  * @license   https://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  * International Registered Trademark & Property of PrestaShop SA
  */
 
 use PrestaShop\PrestaShop\Adapter\Cart\CartPresenter;
+use PrestaShop\PrestaShop\Core\Filter\CollectionFilter;
+use PrestaShop\PrestaShop\Core\Filter\FrontEndObject\ProductFilter;
 
 class CartControllerCore extends FrontController
 {
@@ -128,12 +130,18 @@ class CartControllerCore extends FrontController
 
         if (!$this->errors) {
             $cartPresenter = new CartPresenter();
+            $presentedCart = $cartPresenter->present($this->context->cart);
+
+            // filter product output
+            $presentedCart['products'] = $this->get('prestashop.core.filter.front_end_object.product_collection')
+                ->filter($presentedCart['products']);
+
             $this->ajaxDie(Tools::jsonEncode([
                 'success' => true,
                 'id_product' => $this->id_product,
                 'id_product_attribute' => $this->id_product_attribute,
                 'quantity' => $productQuantity,
-                'cart' => $cartPresenter->present($this->context->cart),
+                'cart' => $presentedCart,
                 'errors' => empty($this->updateOperationError) ? '' : reset($this->updateOperationError),
             ]));
         } else {
@@ -164,9 +172,23 @@ class CartControllerCore extends FrontController
         ]));
     }
 
+    /**
+     * @deprecated 1.7.3.1 the product link is now accessible
+     *                     in #quantity_wanted[data-url-update]
+     */
     public function displayAjaxProductRefresh()
     {
         if ($this->id_product) {
+            $idProductAttribute = 0;
+            $groups = Tools::getValue('group');
+
+            if (!empty($groups)) {
+                $idProductAttribute = (int) Product::getIdProductAttributeByIdAttributes(
+                    $this->id_product,
+                    $groups,
+                    true
+                );
+            }
             $url = $this->context->link->getProductLink(
                 $this->id_product,
                 null,
@@ -174,7 +196,7 @@ class CartControllerCore extends FrontController
                 null,
                 $this->context->language->id,
                 null,
-                (int)Product::getIdProductAttributesByIdAttributes($this->id_product, Tools::getValue('group'), true),
+                $idProductAttribute,
                 false,
                 false,
                 true,
@@ -402,7 +424,7 @@ class CartControllerCore extends FrontController
         }
 
         // Check product quantity availability
-        if ($this->shouldAvailabilityErrorBeRaised($product, $qty_to_check)) {
+        if ('update' !== $mode && $this->shouldAvailabilityErrorBeRaised($product, $qty_to_check)) {
             array_push(
                 $this->{$ErrorKey},
                 $this->trans(
@@ -478,14 +500,25 @@ class CartControllerCore extends FrontController
                     );
                 } elseif (!$update_quantity) {
                     array_push(
-                        $this->{$ErrorKey},
+                        $this->errors,
                         $this->trans(
                             'You already have the maximum quantity available for this product.',
                             array(),
                             'Shop.Notifications.Error'
                         )
                     );
+                } elseif ($this->shouldAvailabilityErrorBeRaised($product, $qty_to_check)) {
+                    // check quantity after cart quantity update
+                    array_push(
+                        $this->{$ErrorKey},
+                        $this->trans(
+                            'The item %product% in your cart is no longer available in this quantity. You cannot proceed with your order until the quantity is adjusted.',
+                            array('%product%' => $product->name),
+                            'Shop.Notifications.Error'
+                        )
+                    );
                 }
+
             }
         }
 
@@ -533,11 +566,20 @@ class CartControllerCore extends FrontController
         if (($this->id_product_attribute)) {
             return (!Product::isAvailableWhenOutOfStock($product->out_of_stock)
                 && !Attribute::checkAttributeQty($this->id_product_attribute, $qtyToCheck));
-        } else {
-            return (!$product->checkQty($qtyToCheck));
+        } elseif (Product::isAvailableWhenOutOfStock($product->out_of_stock)) {
+            return false;
         }
 
-        return false;
+        // product quantity is the available quantity after decreasing products in cart
+        $productQuantity = Product::getQuantity(
+            $this->id_product,
+            $this->id_product_attribute,
+            null,
+            $this->context->cart,
+            $this->customization_id
+        );
+
+        return $productQuantity < 0;
     }
 
     /**

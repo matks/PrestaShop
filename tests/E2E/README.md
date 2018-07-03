@@ -34,7 +34,7 @@ To run these tests you have to install
 
 This command line does it for you (you need a mysql user presta:presta with the right to create a database on localhost)
 ```
-php install/index_cli.php --language=en --country=fr --domain=localhost --db_server=localhostr --db_user=presta --db_name=presta --db_password=presta --firstname=Foo --lastname=Bar --email=demo@prestashop.com --password=prestashop_demo --db_create=1
+php install/index_cli.php --language=en --country=fr --domain=localhost --db_server=localhostr --db_user=presta --db_name=presta --DB_PASSWD=presta --firstname=Foo --lastname=Bar --email=demo@prestashop.com --password=prestashop_demo --db_create=1
 ```
 > Note:
 > Or you can run the installation script via the npm script specific-test
@@ -83,11 +83,12 @@ If you want to
   * Specify a module to install => you have to set the **MODULE** parameter
 
 ```
-npm test -- --URL=FrontOfficeURL --INSTALL=true --DB_SERVER=DataBaseUser --DB_PASSWORD=DataBasePassword --DB_USER=DataBaseUser --LANGUAGE=language --COUNTRY=country --MODULE=DataTechNameModule
+npm test -- --URL=FrontOfficeURL --INSTALL=true --DB_SERVER=DataBaseUser --DB_PASSWD=DataBasePassword --DB_USER=DataBaseUser --LANGUAGE=language --COUNTRY=country --MODULE=DataTechNameModule
 ```
 * **URL**: **(Optional)** Front office URL of your PrestaShop website without the “http://” (default to **localhost**)
 * **MODULE**: **(Optional)** Module technical name to install (default to "gadwords")
 * **INSTALL**: **(Optional)** Boolean option : set it to **true** if you want to run the installation script (default to **false**)
+* **TEST_ADDONS**: **(Optional)** Boolean option : set it to **true** if you want disable check with Addons API (default to **false**)
 * **LANGUAGE**: **(Optional)** Language to install with (default to "en")
 * **COUNTRY**: **(Optional)** Country to install with (default o "france")
 * **DB_SERVER**: **(Optional)** DataBase server (default to "mysql")
@@ -111,7 +112,7 @@ path=high/02_product npm run specific-test -- --URL=FrontOfficeURL
 >3) If you have run only the install_upgrade/01_install.js with language different and country different from "en" and "france" you need to reinstall PrestaShop in **English** with setting country to **France** So you can launch the other tests
 
 #### High tests
-If you want to run the high level and full configuration tests you can run the campaign **High**
+If you want to run the high level tests you can run the campaign **High**
 
 ```
 npm run high-test -- --URL=FrontOfficeURL --DIR=DownloadDirectory --MODULE=DataTechNameModule
@@ -123,6 +124,21 @@ npm run high-test -- --URL=FrontOfficeURL --DIR=DownloadDirectory --MODULE=DataT
 >Notes:
 >
 > It's not recommended to run all the campaign high tests together, it's safer to run them one by one using the script specific-test.
+
+#### Full tests
+If you want to run the high level and full configuration tests you can run the campaign **Full**
+
+```
+npm run full-test -- --URL=FrontOfficeURL --DIR=DownloadDirectory --MODULE=DataTechNameModule
+```
+* **URL**: **(Optional)** Front office URL of your PrestaShop website without the “http://” (default to **localhost**)
+* **DIR**: **(Required)** Your download directory (exp: /home/toto/Downloads/) so we can check the downloaded invoice.
+* **MODULE**: **(Optional)** Module technical name to install (default to "gadwords")
+
+>Notes:
+>
+> It's not recommended to run all the campaign full tests together, it's safer to run them one by one using the script specific-test.
+
 
 #### Install and Autoupgrade
 If you want to run the Install, Autoupgrade and Rollback tests you can run the campaign **install_upgrade**
@@ -140,7 +156,7 @@ npm run install-upgrade-test -- --URL=FrontOfficeURL --DIR=DownloadDirectory --U
 * **DB_PASSWD**: **(Optional)** DataBase password (default to "doge")
 * **DB_EMPTY_PASSWD**:**(Optional)** Boolean option : set it to **true** if you have no password
 * **RCTARGET**: **(Required)** Last stable version location directory (example: /project/prestashop1724/)
-* **RCLINK**: **(Optional)** RC Download link, if you have already downloaded the RC you have to extract the ZIP file in the --RCTARGET admin-dev/autoupgrade/download/ and set the FILENAME option
+* **RCLINK**: **(Optional)** RC Download link, if you have already downloaded the RC you have to copy the ZIP file in the --RCTARGET admin-dev/autoupgrade/download/ and set the FILENAME option
 * **FILENAME**: **(Optional)** RC file name this parameter must be mentioned if the (RCLINK) option is not indicated
 
 
