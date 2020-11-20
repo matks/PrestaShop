@@ -296,6 +296,8 @@ final class SearchProductsHandler extends AbstractOrderHandler implements Search
         int $computingPrecision,
         ?Order $order)
     {
+        $dummy = null;
+
         if (null === $order) {
             return Product::getPriceStatic($productId, $withTaxes, $productAttributeId, $computingPrecision);
         }
@@ -312,7 +314,9 @@ final class SearchProductsHandler extends AbstractOrderHandler implements Search
             false,
             $order->id_customer,
             $order->id_cart,
-            $order->{Configuration::get('PS_TAX_ADDRESS_TYPE', null, null, $order->id_shop)}
+            $order->{Configuration::get('PS_TAX_ADDRESS_TYPE', null, null, $order->id_shop)},
+            $dummy,
+            false
         );
     }
 }
