@@ -15,6 +15,10 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v2
+      - name: Define variables
+        run: echo "Tags are > ${TAG1}"
+        env:
+            PS_VERSION_TO_INSTALL: '1.7.6.4'
       - name: Run docker compose
         run: docker-compose -f docker-compose.tests.yml up -d --build -e PS_VERSION_TO_INSTALL=1.7.6.4
       - name: Sleep
