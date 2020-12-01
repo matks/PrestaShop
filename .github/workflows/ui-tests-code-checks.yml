@@ -1,4 +1,4 @@
-name: UI tests code checks
+name: UI upgrade POC
 
 on:
   pull_request:
@@ -9,37 +9,17 @@ defaults:
       working-directory: ./tests/UI/
 
 jobs:
-
-  ESLint:
+  POC:
     runs-on: ubuntu-latest
-    name: ESLint
-    if: contains(github.event.pull_request.labels.*.name, 'TE')
-
+    name: POC
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v2
-
-      - name: Install dependencies in UI tests directory
-        run: npm install
-
-      - name: Check eslint errors
-        run: npm run lint
-
-  Steps-identifiers:
-    runs-on: ubuntu-latest
-    name: Checking doubles in steps identifiers
-    if: contains(github.event.pull_request.labels.*.name, 'TE')
-
-    steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v2
-
-      - name: Install dependencies in UI tests directory
-        run: npm install
-
-      - name: Generate mocha reports with failed steps
-        run: GENERATE_FAILED_STEPS=true npm run functional-tests
-        continue-on-error: true
-
-      - name: Checking doubles in steps identifiers
-        run: npm run step-identifiers-checker
+      - name: Run docker compose
+        run: docker-compose -f docker-compose.nightly.yml -f docker-compose.tests.yml up -d --build
+      - name: Sleep
+        run: sleep 10
+      - name: Wait for docker compose
+        run: docker-compose -f docker-compose.nightly.yml -f docker-compose.tests.yml exec -T tests /tmp/wait-for-it.sh --timeout=720 --strict prestashop-web:80
+      - name: Run sanity tests
+        run: docker-compose -f docker-compose.nightly.yml -f docker-compose.tests.yml exec -T -e COMMAND="sanity-tests" tests bash /tmp/run-tests.sh
