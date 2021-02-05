@@ -1,0 +1,44 @@
+name: Cron Update License Headers
+on: [push, pull_request]
+jobs:
+  license-headers-fix:
+    runs-on: ubuntu-latest
+    name: Fix License Headers
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v1
+        with:
+          php-version: '7.4'
+          extensions: mbstring, intl, gd, xml, dom, json, fileinfo, curl, zip, iconv, simplexml
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist
+
+      - name: Dump JS Routing file
+        run: php bin/console prestashop:licenses:update
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+            token: ${{ secrets.GITHUB_TOKEN }}
+            commit-message: Update License Headers
+            committer: PrestonBot <noreply@github.com>
+            author: prestonBot <prestonBot@users.noreply.github.com>
+            title: 'Update License Headers'
+            body: |
+                    | Questions         | Answers
+                    | ----------------- | -------------------------------------------------------
+                    | Branch?           | develop
+                    | Description?      | Update License Headers
+                    | Type?             | improvement
+                    | Category?         | PM
+                    | BC breaks?        | no
+                    | Deprecations?     | no
+                    | Fixed ticket?     | N/A
+                    | How to test?      | N/A
+                    | Possible impacts? | N/A
+            base: 'develop'
+            delete-branch: true
