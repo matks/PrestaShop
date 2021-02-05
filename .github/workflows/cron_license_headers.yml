@@ -17,8 +17,8 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --prefer-dist
 
-      - name: Dump JS Routing file
-        run: php bin/console prestashop:licenses:update
+      - name: Fix License Headers
+        run: php -d memory_limit=-1 bin/console prestashop:licenses:update
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
