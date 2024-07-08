@@ -49,6 +49,7 @@
   text-align: center;
   vertical-align: top;
   margin-top: 32px;
+  border-radius: 30px;
 }
 
 .spinner > svg {
@@ -100,7 +101,7 @@
 #progressContainer > .progress > .current {
   position: relative;
   height: 100%;
-  background: #25B9D7;
+  background: #a4dbe8;
   border-radius: 16px;
   -webkit-transition: all 400ms linear;
      -moz-transition: all 400ms linear;
@@ -144,7 +145,7 @@
 }
 
 #versionPanel {
-  color: #6c868e;
+  color: #a4dbe8;
 }
 
 #header {
