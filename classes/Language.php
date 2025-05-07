@@ -1320,10 +1320,8 @@ class LanguageCore extends ObjectModel implements LanguageInterface
 
         // As soon as new XLF catalogue is installed the translator catalogues are not up to date
         // anymore, so we force them to reload
-        self::loadAdminTranslatorLocale($locale, true);
 
         // Symfony cache must be cleared after new language is installed
-        Tools::clearSf2Cache();
 
         return true;
     }
